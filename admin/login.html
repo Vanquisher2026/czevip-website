@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n="login.title">Sign in - CZEVIP Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<div class="login-shell">
+  <form class="login-card" id="login-form">
+    <div class="brand">CZEVIP</div>
+    <div class="sub" data-i18n="brand.sub">Admin Console</div>
+    <div class="field">
+      <label for="password" data-i18n="login.password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required autofocus>
+    </div>
+    <button class="btn btn-primary" type="submit" id="submit-btn" data-i18n="login.submit">Sign in</button>
+    <div class="err" id="err"></div>
+    <div class="hint" data-i18n="login.hint">Default dev password: czevip-admin. Set ADMIN_PASSWORD in Cloudflare Pages env vars for production.</div>
+    <div style="margin-top:16px;text-align:center">
+      <button type="button" class="btn btn-ghost btn-sm" data-lang-toggle style="font-size:11px">EN / ÖÐÎÄ</button>
+    </div>
+  </form>
+</div>
+<script src="/admin/i18n.js"></script>
+<script src="/admin/admin.js"></script>
+<script>
+  (function () {
+    const a = window.czAdmin;
+    const form = document.getElementById('login-form');
+    const errEl = document.getElementById('err');
+    const btn = document.getElementById('submit-btn');
+    const I = window.czI18n.t;
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      errEl.classList.remove('show');
+      btn.disabled = true;
+      btn.textContent = I('login.signingIn');
+      try {
+        const r = await fetch('/api/admin/login', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: document.getElementById('password').value })
+        });
+        if (!r.ok) {
+          const data = await r.json().catch(() => ({}));
+          throw new Error(data.error || I('login.failed'));
+        }
+        location.href = '/admin/index.html';
+      } catch (err) {
+        errEl.textContent = err.message || I('login.failed');
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = I('login.submit');
+      }
+    });
+    document.querySelector('[data-lang-toggle]').addEventListener('click', () => {
+      const cur = window.czI18n.getLocale();
+      window.czI18n.setLocale(cur === 'zh' ? 'en' : 'zh');
+      window.czI18n.applyAll();
+      btn.textContent = I('login.submit');
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /google-merchant.xml
+Disallow: /api/
+Disallow: /cart.html
+Disallow: /admin/
+Sitemap: https://czevip.com/sitemap.xml

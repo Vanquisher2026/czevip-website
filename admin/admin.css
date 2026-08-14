@@ -1,0 +1,19 @@
+/* Override: add lang toggle button style. Append to existing admin.css. */
+.lang-btn { background: transparent; border: 1px solid rgba(255,255,255,.18); color: #d8d2c5; padding: 6px 10px; border-radius: 4px; font-size: 11px; letter-spacing: .08em; cursor: pointer; transition: all .15s ease; }
+.lang-btn:hover { background: rgba(255,255,255,.06); color: #fff; border-color: rgba(255,255,255,.3); }
+
+/* Bulk action bar */
+.bulk-bar { display: none; align-items: center; gap: 8px; padding: 10px 14px; background: var(--ink); color: #fff; border-radius: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.bulk-bar.show { display: flex; }
+.bulk-bar .count { font-size: 13px; }
+.bulk-bar select, .bulk-bar input { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 12px; min-width: 100px; }
+.bulk-bar input { min-width: 80px; }
+.bulk-bar input::placeholder { color: rgba(255,255,255,.5); }
+.bulk-bar .btn { background: var(--accent); color: var(--ink); border-color: var(--accent); font-weight: 500; }
+.bulk-bar .btn:hover { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
+.bulk-bar .clear { background: transparent; color: #d8d2c5; border: 0; }
+.bulk-bar .clear:hover { color: #fff; }
+
+.table .check-cell { width: 32px; }
+.table input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; accent-color: var(--ink); }
+.table tr.selected { background: rgba(184,149,106,.10); }

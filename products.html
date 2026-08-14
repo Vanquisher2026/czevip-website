@@ -1,0 +1,70 @@
+﻿ <!doctype html>
+ <html lang="en">
+ <head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>Shop All Hats - CZEVIP</title>
+ <meta name="description" content="Browse the full CZEVIP collection: fedoras, panamas, berets, caps and more. Heritage craftsmanship, free worldwide shipping over $150.">
+ <link rel="canonical" href="https://czevip.com/products.html">
+ <link rel="alternate" hreflang="en" href="https://czevip.com/products.html">
+ <link rel="alternate" hreflang="zh" href="https://czevip.com/zh/products.html">
+ <link rel="alternate" hreflang="x-default" href="https://czevip.com/products.html">
+ <meta property="og:title" content="Shop All Hats - CZEVIP">
+ <meta property="og:description" content="Fedoras, panamas, berets and caps.">
+ <meta property="og:url" content="https://czevip.com/products.html">
+ <meta property="og:type" content="website">
+ <meta name="theme-color" content="#14110E">
+ <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/style.css">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+ </head>
+ <body>
+ <a class="skip" href="#main">Skip to content</a>
+ <div data-header></div>
+ <main id="main">
+   <section class="section" style="padding-bottom:32px">
+     <p class="eyebrow">The Collection</p>
+     <h1>Shop all hats</h1>
+     <p class="lede">Every piece, finished by hand and signed on the sweatband.</p>
+   </section>
+   <div class="filters">
+     <div class="group" data-filter="cat">
+      <button class="chip active" data-val="">All</button>
+      <button class="chip" data-val="dad">Dad</button>
+      <button class="chip" data-val="mom">Mom</button>
+      <button class="chip" data-val="wife">Wife</button>
+      <button class="chip" data-val="set">Sets</button>
+      <button class="chip" data-val="fedora">Fedoras</button>
+      <button class="chip" data-val="panama">Panamas</button>
+      <button class="chip" data-val="beret">Berets</button>
+      <button class="chip" data-val="cap">Caps</button>
+      <button class="chip" data-val="sun">Sun</button>
+      <button class="chip" data-val="beanie">Beanies</button>
+     </div>
+     <div class="group" data-filter="price">
+       <button class="chip active" data-val="">Any price</button>
+       <button class="chip" data-val="0-100">Under $100</button>
+       <button class="chip" data-val="100-200">$100-200</button>
+       <button class="chip" data-val="200-500">$200+</button>
+     </div>
+     <div class="group" data-filter="sort">
+       <button class="chip active" data-val="featured">Featured</button>
+       <button class="chip" data-val="price-asc">Price up</button>
+       <button class="chip" data-val="price-desc">Price down</button>
+       <button class="chip" data-val="new">New</button>
+     </div>
+   </div>
+   <section class="section" style="padding-top:0">
+     <div class="grid grid-4" data-catalog></div>
+     <div class="empty" data-empty hidden>
+       <h2>No matches</h2>
+       <p>Try a different filter combination.</p>
+     </div>
+   </section>
+ </main>
+ <div data-footer></div>
+ <script src="/main.js" defer></script>
+ <script src="/products.js" defer></script>
+ <script src="/cart.js" defer></script>
+ </body>
+ </html>

@@ -1,0 +1,46 @@
+﻿ <!doctype html>
+ <html lang="en">
+ <head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>Cart - CZEVIP</title>
+ <meta name="description" content="Review your cart and checkout securely via Stripe.">
+ <link rel="canonical" href="https://czevip.com/cart.html">
+ <meta name="robots" content="noindex">
+ <meta name="theme-color" content="#14110E">
+ <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/style.css">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+ </head>
+ <body>
+ <a class="skip" href="#main">Skip to content</a>
+ <div data-header></div>
+ <main id="main">
+   <section class="section" style="padding-bottom:32px">
+     <p class="eyebrow">Your bag</p>
+     <h1>Cart</h1>
+   </section>
+   <section class="cart-wrap">
+     <div data-cart-root>
+       <div class="empty" data-cart-empty>
+         <h2>Your cart is empty</h2>
+         <p>Add a hat from the <a href="/products.html" style="border-bottom:1px solid currentColor">collection</a>.</p>
+       </div>
+       <div data-cart-items hidden></div>
+     </div>
+     <aside class="cart-summary" data-cart-summary hidden>
+       <h3>Order summary</h3>
+       <div class="line"><span>Subtotal</span><span data-subtotal>$0</span></div>
+       <div class="line"><span>Shipping</span><span data-shipping>Calculated at checkout</span></div>
+       <div class="line"><span>Tax</span><span data-tax>Calculated at checkout</span></div>
+       <div class="line total"><span>Estimated total</span><span data-total>$0</span></div>
+       <button class="btn btn-primary" style="width:100%;margin-top:16px" data-checkout>Checkout</button>
+       <p style="margin-top:12px;font-size:12px;color:var(--ink-3);text-align:center">Secure payment by Stripe</p>
+     </aside>
+   </section>
+ </main>
+ <div data-footer></div>
+ <script src="/main.js" defer></script>
+ <script src="/cart.js" defer></script>
+ </body>
+ </html>

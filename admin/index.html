@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n="dash.title">Dashboard - CZEVIP Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<div id="app-shell" class="app">
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1 data-i18n="dash.title">Dashboard</h1>
+        <div class="sub" data-i18n="dash.sub">Overview of inquiries and catalog</div>
+      </div>
+    </div>
+    <div class="stats" id="stats">
+      <div class="card stat"><span class="label" data-i18n="dash.inqTotal">Inquiries total</span><span class="value" id="stat-inq-total">-</span><span class="meta" id="stat-inq-new"></span></div>
+      <div class="card stat"><span class="label" data-i18n="dash.oemInq">OEM inquiries</span><span class="value" id="stat-inq-oem">-</span><span class="meta" data-i18n="dash.oemMeta">Manufacturing inquiries</span></div>
+      <div class="card stat"><span class="label" data-i18n="dash.partnerInq">Creator applications</span><span class="value" id="stat-inq-partner">-</span><span class="meta" data-i18n="dash.partnerMeta">Influencer applications</span></div>
+      <div class="card stat"><span class="label" data-i18n="dash.products">Products</span><span class="value" id="stat-prod-total">-</span><span class="meta" id="stat-prod-active"></span></div>
+    </div>
+    <div class="card mb-16">
+      <div class="flex between center mb-12">
+        <h2 data-i18n="dash.recent">Recent inquiries</h2>
+        <a href="/admin/inquiries.html" class="btn btn-ghost btn-sm" data-i18n="dash.viewAll">View all</a>
+      </div>
+      <table class="table" id="recent-table">
+        <thead><tr><th data-i18n="inq.colWhen">When</th><th data-i18n="inq.colKind">Kind</th><th data-i18n="inq.colName">Name</th><th data-i18n="inq.colEmail">Email</th><th data-i18n="inq.colStatus">Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2 data-i18n="dash.quickActions">Quick actions</h2>
+      <p class="muted mt-16" style="font-size:13px" data-i18n="dash.quickDesc">Common tasks.</p>
+      <div class="flex gap-8 mt-16">
+        <a class="btn btn-ghost" href="/admin/products.html" data-i18n="dash.addProduct">Add product</a>
+        <a class="btn btn-ghost" href="/admin/inquiries.html" data-i18n="dash.reviewInq">Review inquiries</a>
+        <button class="btn btn-ghost" id="btn-seed" data-i18n="dash.seed">Seed D1 from products.json</button>
+      </div>
+      <p class="muted mt-16" style="font-size:12px" data-i18n="dash.seedHint">Seeding is idempotent. Use once when D1 is empty so existing products can be managed.</p>
+    </div>
+  </main>
+</div>
+<script src="/admin/i18n.js"></script>
+<script src="/admin/admin.js"></script>
+<script>
+  (async function () {
+    const a = window.czAdmin;
+    const I = window.czI18n.t;
+    await a.boot('dashboard');
+    try {
+      const stats = await a.api('GET', '/stats');
+      a.$('#stat-inq-total').textContent = stats.inquiries.total;
+      const newCount = (stats.inquiries.by_status && stats.inquiries.by_status.new) || 0;
+      a.$('#stat-inq-new').textContent = newCount + ' ' + I('dash.unread').replace(/^.+?(\d+\s)/, '$1').trim() || (newCount + ' ' + I('dash.unread'));
+      a.$('#stat-inq-new').textContent = newCount + ' unread';
+      a.$('#stat-inq-oem').textContent = (stats.inquiries.by_kind && stats.inquiries.by_kind.oem) || 0;
+      a.$('#stat-inq-partner').textContent = (stats.inquiries.by_kind && stats.inquiries.by_kind.partner) || 0;
+      a.$('#stat-prod-total').textContent = stats.products.total;
+      a.$('#stat-prod-active').textContent = stats.products.active + ' ' + I('dash.activeOf');
+    } catch (e) { a.toast(I('dash.failedStats') + ': ' + e.message, 'error'); }
+    try {
+      const list = await a.api('GET', '/inquiries?limit=5');
+      const tbody = a.$('#recent-table tbody');
+      if (!list.items || !list.items.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="5">' + I('dash.noInq') + '</td></tr>';
+      } else {
+        tbody.innerHTML = list.items.map(i =>
+          '<tr>' +
+            '<td>' + a.esc(a.timeAgo(i.created_at)) + '</td>' +
+            '<td>' + a.esc(i.kind) + '</td>' +
+            '<td>' + a.esc(i.name) + '</td>' +
+            '<td>' + a.esc(i.email) + '</td>' +
+            '<td><span class="badge badge-' + a.esc(i.status) + '">' + a.esc(i.status) + '</span></td>' +
+          '</tr>'
+        ).join('');
+      }
+    } catch (e) {}
+    a.$('#btn-seed').addEventListener('click', async () => {
+      if (!confirm(I('dash.seed') + '?')) return;
+      try {
+        const r = await a.api('POST', '/seed-products');
+        a.toast(I('dash.seeded', { n: r.inserted, s: r.skipped }), 'success');
+      } catch (e) { a.toast(I('dash.seed') + ' failed: ' + e.message, 'error'); }
+    });
+    document.addEventListener('cz-locale-change', () => {
+      a.$('#stat-inq-active-text') && (a.$('#stat-inq-active-text').textContent = I('dash.activeOf'));
+    });
+  })();
+</script>
+</body>
+</html>

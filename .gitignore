@@ -1,0 +1,24 @@
+# Logs and transient server files
+.server.log
+.server.err.log
+.cleanup.ps1
+
+# OS junk
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node / Wrangler
+node_modules/
+.wrangler/
+
+# Secrets (never commit - set via Cloudflare Pages env vars instead)
+.env
+.env.local
+.env.production

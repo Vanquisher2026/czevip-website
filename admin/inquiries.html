@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n="inq.title">Inquiries - CZEVIP Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<div id="app-shell" class="app">
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1 data-i18n="inq.title">Inquiries</h1>
+        <div class="sub" id="total-line" data-i18n="inq.loading">Loading...</div>
+      </div>
+    </div>
+    <div class="filters">
+      <div class="group" data-filter="kind">
+        <button class="chip active" data-val="" data-i18n="inq.allKinds">All kinds</button>
+        <button class="chip" data-val="contact" data-i18n="inq.kindContact">Contact</button>
+        <button class="chip" data-val="oem" data-i18n="inq.kindOem">OEM</button>
+        <button class="chip" data-val="partner" data-i18n="inq.kindPartner">Partner</button>
+      </div>
+      <div class="group" data-filter="status">
+        <button class="chip active" data-val="" data-i18n="inq.allStatus">All status</button>
+        <button class="chip" data-val="new" data-i18n="inq.statusNew">New</button>
+        <button class="chip" data-val="read" data-i18n="inq.statusRead">Read</button>
+        <button class="chip" data-val="replied" data-i18n="inq.statusReplied">Replied</button>
+        <button class="chip" data-val="archived" data-i18n="inq.statusArchived">Archived</button>
+      </div>
+    </div>
+    <table class="table">
+      <thead><tr><th data-i18n="inq.colWhen">When</th><th data-i18n="inq.colKind">Kind</th><th data-i18n="inq.colName">Name</th><th data-i18n="inq.colEmail">Email</th><th data-i18n="inq.colStatus">Status</th><th></th></tr></thead>
+      <tbody id="rows"><tr class="empty-row"><td colspan="6" data-i18n="inq.loading">Loading...</td></tr></tbody>
+    </table>
+  </main>
+</div>
+<script src="/admin/i18n.js"></script>
+<script src="/admin/admin.js"></script>
+<script>
+  (async function () {
+    const a = window.czAdmin;
+    const I = window.czI18n.t;
+    await a.boot('inquiries');
+    const state = { kind: '', status: '' };
+    async function load() {
+      const params = new URLSearchParams();
+      if (state.kind) params.set('kind', state.kind);
+      if (state.status) params.set('status', state.status);
+      const qs = params.toString() ? '?' + params.toString() : '';
+      try {
+        const r = await a.api('GET', '/inquiries' + qs);
+        a.$('#total-line').textContent = I('inq.totalLine', { n: r.total });
+        const tbody = a.$('#rows');
+        if (!r.items.length) {
+          tbody.innerHTML = '<tr class="empty-row"><td colspan="6">' + I('inq.empty') + '</td></tr>';
+          return;
+        }
+        tbody.innerHTML = r.items.map(i =>
+          '<tr>' +
+            '<td>' + a.esc(a.fmtDate(i.created_at)) + '</td>' +
+            '<td>' + a.esc(i.kind) + '</td>' +
+            '<td>' + a.esc(i.name) + '</td>' +
+            '<td><a href="mailto:' + a.esc(i.email) + '">' + a.esc(i.email) + '</a></td>' +
+            '<td><span class="badge badge-' + a.esc(i.status) + '">' + a.esc(i.status) + '</span></td>' +
+            '<td class="flex gap-8"><button class="btn btn-sm btn-ghost" data-view="' + i.id + '">' + I('inq.view') + '</button>' +
+              '<select data-status="' + i.id + '" data-cur="' + a.esc(i.status) + '">' +
+                '<option value="new">' + I('inq.statusNew') + '</option>' +
+                '<option value="read">' + I('inq.statusRead') + '</option>' +
+                '<option value="replied">' + I('inq.statusReplied') + '</option>' +
+                '<option value="archived">' + I('inq.statusArchived') + '</option>' +
+              '</select></td>' +
+          '</tr>'
+        ).join('');
+        a.$$('select[data-status]').forEach(s => { s.value = s.getAttribute('data-cur'); });
+        a.$$('button[data-view]').forEach(btn => btn.addEventListener('click', () => viewInquiry(btn.getAttribute('data-view'))));
+        a.$$('select[data-status]').forEach(sel => sel.addEventListener('change', () => updateStatus(sel.getAttribute('data-status'), sel.value)));
+      } catch (e) { a.toast(I('prod.loadFailed') + ': ' + e.message, 'error'); }
+    }
+    async function viewInquiry(id) {
+      try {
+        const r = await a.api('GET', '/inquiries/' + id);
+        const it = r.item;
+        let payloadHtml = '';
+        try {
+          const obj = JSON.parse(it.payload || '{}');
+          payloadHtml = '<dl class="kv">' +
+            Object.keys(obj).map(k => '<dt>' + a.esc(k) + '</dt><dd>' + a.esc(String(obj[k])) + '</dd>').join('') +
+          '</dl>';
+        } catch (e) { payloadHtml = '<pre class="payload">' + a.esc(it.payload) + '</pre>'; }
+        const html =
+          '<div class="modal-head"><h2>' + I('inq.modalTitle', { id: it.id }) + ' &middot; ' + a.esc(it.kind) + '</h2><button class="close-x" onclick="czAdmin.closeModal()">&times;</button></div>' +
+          '<div class="modal-body">' +
+            '<div class="kv mb-16"><dt>' + I('inq.colName') + '</dt><dd>' + a.esc(it.name) + '</dd>' +
+            '<dt>' + I('inq.colEmail') + '</dt><dd>' + a.esc(it.email) + '</dd>' +
+            '<dt>' + I('inq.submitted') + '</dt><dd>' + a.esc(a.fmtDate(it.created_at)) + '</dd>' +
+            '<dt>' + I('inq.colStatus') + '</dt><dd><span class="badge badge-' + a.esc(it.status) + '">' + a.esc(it.status) + '</span></dd>' +
+            (it.ip ? '<dt>' + I('inq.ip') + '</dt><dd>' + a.esc(it.ip) + '</dd>' : '') + '</div>' +
+            '<h3 class="mb-12">' + I('inq.payload') + '</h3>' + payloadHtml +
+          '</div>' +
+          '<div class="modal-foot"><a href="mailto:' + a.esc(it.email) + '" class="btn btn-ghost">' + I('inq.replyByEmail') + '</a>' +
+            '<button class="btn btn-primary" onclick="czAdmin.closeModal()">' + I('inq.close') + '</button></div>';
+        a.openModal(html);
+        if (it.status === 'new') {
+          try { await a.api('PATCH', '/inquiries/' + id, { status: 'read' }); load(); } catch (e) {}
+        }
+      } catch (e) { a.toast('Failed: ' + e.message, 'error'); }
+    }
+    async function updateStatus(id, status) {
+      try { await a.api('PATCH', '/inquiries/' + id, { status }); a.toast(I('inq.updated', { s: status }), 'success'); load(); }
+      catch (e) { a.toast('Update failed: ' + e.message, 'error'); }
+    }
+    a.$$('[data-filter]').forEach(group => {
+      const key = group.getAttribute('data-filter');
+      group.addEventListener('click', e => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        state[key] = chip.getAttribute('data-val');
+        group.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === chip));
+        load();
+      });
+    });
+    load();
+  })();
+</script>
+</body>
+</html>
