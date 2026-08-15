@@ -47,3 +47,9 @@ CREATE TABLE IF NOT EXISTS products (
 );
 CREATE INDEX IF NOT EXISTS idx_products_cat ON products(cat);
 CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+);
+INSERT OR IGNORE INTO settings (key, value) VALUES ('admin_password_hash', '');

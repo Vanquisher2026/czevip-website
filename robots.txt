@@ -1,7 +1,53 @@
-User-agent: *
+﻿User-agent: *
 Allow: /
 Allow: /google-merchant.xml
+Allow: /llms.txt
+Allow: /llms-full.txt
 Disallow: /api/
 Disallow: /cart.html
 Disallow: /admin/
-Sitemap: https://czevip.com/sitemap.xml
+
+# Explicit AI / LLM crawler permissions (faster AI indexing)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+Sitemap: https://www.czevip.com/sitemap.xml

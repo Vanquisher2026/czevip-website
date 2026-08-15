@@ -43,7 +43,29 @@
         <button class="btn btn-ghost" id="btn-seed" data-i18n="dash.seed">Seed D1 from products.json</button>
       </div>
       <p class="muted mt-16" style="font-size:12px" data-i18n="dash.seedHint">Seeding is idempotent. Use once when D1 is empty so existing products can be managed.</p>
-    </div>
+
+        <div class="card mt-16">
+      <h2 data-i18n="dash.security">Security</h2>
+      <p class="muted mt-8" style="font-size:13px" data-i18n="dash.changePassword">Change admin password</p>
+      <form id="pw-form" class="mt-16" style="max-width:480px">
+        <label style="display:block;margin-bottom:12px">
+          <span style="display:block;font-size:12px;color:var(--ink-2);margin-bottom:4px" data-i18n="dash.passwordCurrent">Current password</span>
+          <input type="password" name="current" autocomplete="current-password" required style="width:100%;padding:8px 10px;border:1px solid var(--ink-2);border-radius:6px;background:var(--bg-2);color:var(--ink-1)">
+        </label>
+        <label style="display:block;margin-bottom:12px">
+          <span style="display:block;font-size:12px;color:var(--ink-2);margin-bottom:4px" data-i18n="dash.passwordNext">New password (min 10 characters)</span>
+          <input type="password" name="next" autocomplete="new-password" minlength="10" required style="width:100%;padding:8px 10px;border:1px solid var(--ink-2);border-radius:6px;background:var(--bg-2);color:var(--ink-1)">
+        </label>
+        <label style="display:block;margin-bottom:12px">
+          <span style="display:block;font-size:12px;color:var(--ink-2);margin-bottom:4px" data-i18n="dash.passwordConfirm">Confirm new password</span>
+          <input type="password" name="confirm" autocomplete="new-password" minlength="10" required style="width:100%;padding:8px 10px;border:1px solid var(--ink-2);border-radius:6px;background:var(--bg-2);color:var(--ink-1)">
+        </label>
+        <div class="flex gap-8">
+          <button type="submit" class="btn btn-primary" data-i18n="dash.passwordUpdate">Update password</button>
+          <span id="pw-msg" class="muted" style="font-size:13px;align-self:center"></span>
+        </div>
+      </form>
+    </div>    </div>
   </main>
 </div>
 <script src="/admin/i18n.js"></script>
@@ -63,6 +85,30 @@
       a.$('#stat-inq-partner').textContent = (stats.inquiries.by_kind && stats.inquiries.by_kind.partner) || 0;
       a.$('#stat-prod-total').textContent = stats.products.total;
       a.$('#stat-prod-active').textContent = stats.products.active + ' ' + I('dash.activeOf');
+    // Password change
+    const pwForm = document.getElementById('pw-form');
+    if (pwForm) {
+      const msg = document.getElementById('pw-msg');
+      pwForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        msg.textContent = '';
+        const fd = new FormData(pwForm);
+        const current = String(fd.get('current') || '');
+        const next = String(fd.get('next') || '');
+        const confirm = String(fd.get('confirm') || '');
+        if (next !== confirm) { msg.textContent = I('dash.passwordMismatch'); return; }
+        if (next.length < 10) { msg.textContent = I('dash.passwordTooShort'); return; }
+        try {
+          await a.api('POST', '/change-password', { current, next });
+          msg.textContent = I('dash.passwordUpdated');
+          pwForm.reset();
+        } catch (err) {
+          const code = (err && err.body && err.body.error) || '';
+          if (code === 'Current password is incorrect') msg.textContent = I('dash.passwordBadCurrent');
+          else msg.textContent = I('dash.passwordFailed') + (code ? ': ' + code : '');
+        }
+      });
+    }
     } catch (e) { a.toast(I('dash.failedStats') + ': ' + e.message, 'error'); }
     try {
       const list = await a.api('GET', '/inquiries?limit=5');

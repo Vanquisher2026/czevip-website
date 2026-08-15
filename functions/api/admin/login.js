@@ -1,5 +1,5 @@
-// Admin login: validate password, create session, set HttpOnly cookie.
-import { buildCookie, createSession, passwordFromEnv, timingSafeEqual, TTL_SECONDS } from './_session.js';
+﻿// Admin login: validate password, create session, set HttpOnly cookie.
+import { buildCookie, createSession, passwordFromEnv, passwordFromDbOrEnv, timingSafeEqual, TTL_SECONDS } from './_session.js';
 
 export async function onRequestPost({ request, env }) {
   const cors = {
@@ -13,7 +13,7 @@ export async function onRequestPost({ request, env }) {
     return json({ error: 'Invalid JSON' }, 400, cors);
   }
   const submitted = String(body.password || '');
-  const expected = passwordFromEnv(env);
+  const expected = await passwordFromDbOrEnv(env);
   if (!submitted || !timingSafeEqual(submitted, expected)) {
     // Constant-time-ish delay even on failure to discourage brute force.
     await new Promise(r => setTimeout(r, 250));

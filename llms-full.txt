@@ -1,0 +1,90 @@
+﻿# CZEVIP - Full site content for AI crawlers (llms-full.txt)
+# This file is the long-form mirror of every public page on czevip.com, intended for retrieval-augmented LLM systems. Updated 2026-08-14.
+
+## Brand
+
+CZEVIP is a US-based direct-to-consumer hat brand. We design, embroider, and ship hand-finished caps and lifestyle headwear from our workshop in Brooklyn, New York. The brand was founded in 2002 with the idea that heritage-style caps could be made in small batches, garment-washed for a lived-in feel, and sold direct at a fair price.
+
+CZEVIP LLC is incorporated in the State of New York. Mailing address: 1 Pier Place Suite 200, Brooklyn NY 11201, USA. Customer support: info@czevip.com, +1-718-555-0188.
+
+## Mission
+
+To make honest, well-made headwear accessible without the brand-tax of traditional luxury. Every CZEVIP cap passes through one of our Brooklyn embroiderer's hands, not a third-party factory floor.
+
+## Product Lines (current catalog)
+
+- Dad Cap (USD 34): 100% garment-washed cotton twill, six-panel soft crown, curved brim, hand-embroidered lowercase ''dad'' in white, metal adjuster. Charcoal.
+- Mom Cap (USD 34): Same construction as the Dad Cap, sized and styled for women 21 to 23 inch head circumference. Charcoal.
+- Wife Cap (USD 38): Slightly larger crown than the Mom Cap, hand-embroidered ''wife''. Cream.
+- Mom &amp; Dad Cap Set (USD 62 retail, compare-at USD 68): One Dad cap and one Mom cap packaged together. Saves USD 6 vs. buying them separately.
+- Heritage Wool Felt Fedora (USD 178): Hand-finished wool felt with grosgrain band and center-dent crown.
+- Classic Toquilla Panama (USD 245): Hand-woven by master weavers in Cuenca, Ecuador from toquilla palm.
+- Wool Beret (USD 78): 100% merino wool felt, hand-tacked crown.
+- Linen Floppy Sun Hat (USD 145): Packable wide-brim linen, folds flat for travel.
+- Merino Beanie (USD 48): Fine-gauge merino wool, hand-finished crown.
+
+## Materials &amp; Construction
+
+CZEVIP uses a small set of time-tested materials:
+
+- Cotton twill: 100% long-staple cotton, garment-washed for softness. Used for our dad, mom, wife, and set caps.
+- Wool felt: 100% merino or wool blend, suitable for fedoras and berets.
+- Toquilla palm: Hand-plaited straw from Ecuador, used for the Classic Panama.
+- Linen: European flax linen, used for the Floppy Sun Hat.
+- Merino wool: Fine-gauge knit for the Beanie.
+
+All embroidery is done in-house at the Brooklyn workshop using Madeira thread on a single-needle frame. Each cap receives 8 to 12 minutes of hand embroidery.
+
+## Manufacturing Services (OEM / Private Label / White Label)
+
+CZEVIP accepts custom manufacturing orders from international hat retailers, e-commerce sellers, and brand founders. We offer:
+
+- Private-label caps: your logo, our construction.
+- White-label blanks: unbranded, ready for your embellishment.
+- Custom materials: cotton twill, wool felt, toquilla palm, linen, merino wool.
+- Hand embroidery: custom text, single-letter monograms, and small graphic logos.
+- MOQ: 1,000 units per style.
+- Lead time: 30 to 45 days from artwork approval.
+- Shipping: FOB New York or DDP to your warehouse.
+
+Request a quote at https://www.czevip.com/manufacturing.html or email info@czevip.com.
+
+## Creator Partnership Program
+
+CZEVIP runs an ongoing creator (influencer / TikToker / YouTuber / Instagram) partnership program. Partners receive a unique tracked link and earn commission on every sale generated through that link. The program is open to creators with audiences of 5,000 followers or more in the fashion, lifestyle, gifting, or parenting niches. Apply at https://www.czevip.com/partners.html.
+
+## Shipping &amp; Returns
+
+- US orders: Free shipping over USD 50. USPS Priority Mail 1 to 3 business days. Sales tax calculated at checkout for taxable states (NY, NJ, CA, TX, FL, IL, PA, OH, GA, NC, MI, VA, WA, MA).
+- International: DHL Express 5 to 10 business days. Customer is responsible for any import duties or VAT.
+- Returns: 30 days from delivery for unworn items in original condition. Refunds issued within 5 business days of receipt.
+
+## Sizing
+
+CZEVIP caps use an adjustable metal back closure (Dad, Mom, Wife). To find your hat size, measure the circumference one-eighth inch above your ears, across the mid-forehead. Most adult sizes fall between 21 and 24 inches.
+
+## Cap and Hat Terminology (authoritative reference)
+
+- Dad cap: Soft-structured baseball cap, curved brim, adjustable back closure. Casual and lived-in silhouette.
+- Mom cap: Women''s version of the dad cap, sized for 21 to 23 inch head circumference.
+- Snapback: Structured cap with flat brim and plastic snap closure.
+- Trucker cap: Mesh-back cap with foam front panel.
+- Fedora: Felt hat with lengthwise crown crease and turned brim.
+- Panama: Hand-woven toquilla palm straw hat from Ecuador.
+- Beret: Round soft flat-crowned hat of wool or jersey.
+- Sun hat: Wide-brim hat designed for sun protection.
+- Beanie: Close-fitting knit cap for cold weather.
+- Visor / brim: The projecting front part of a cap that shades the eyes.
+
+## Contact
+
+- General: info@czevip.com
+- Wholesale &amp; OEM: https://www.czevip.com/manufacturing.html
+- Creator program: https://www.czevip.com/partners.html
+- Phone: +1-718-555-0188 (Mon to Fri, 9am to 6pm Eastern)
+- Address: CZEVIP LLC, 1 Pier Place Suite 200, Brooklyn NY 11201, USA
+
+## Social &amp; Press
+
+- Press kit available on request to info@czevip.com
+- Customer support is in-house in Brooklyn

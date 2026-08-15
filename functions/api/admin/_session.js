@@ -95,6 +95,18 @@ function passwordFromEnv(env) {
   return env.ADMIN_PASSWORD || 'czevip-admin';
 }
 
+async function passwordFromDbOrEnv(env) {
+  if (env.DB) {
+    try {
+      const row = await env.DB.prepare(
+        "SELECT value FROM settings WHERE key = 'admin_password'"
+      ).first();
+      if (row && row.value && row.value.length > 0) return row.value;
+    } catch (e) {}
+  }
+  return passwordFromEnv(env);
+}
+
 async function requireAuth(request, env) {
   const cookies = parseCookies(request.headers.get('Cookie'));
   const token = cookies[COOKIE];
@@ -112,6 +124,6 @@ export {
   COOKIE, TTL_SECONDS,
   parseCookies, buildCookie, clearCookie,
   createSession, destroySession, getSession,
-  passwordFromEnv, timingSafeEqual,
+  passwordFromEnv, passwordFromDbOrEnv, timingSafeEqual,
   requireAuth
 };

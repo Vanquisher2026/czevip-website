@@ -24,6 +24,7 @@
          '<a href="/manufacturing.html">Manufacturing</a>' +
          '<a href="/partners.html">Partners</a>' +
          '<a href="/about.html">About</a>' +
+         '<a href="/faq.html">FAQ</a>' +
          '<a href="/contact.html">Contact</a>' +
        '</nav>' +
        '<div class="bar-actions">' +
@@ -53,6 +54,7 @@
          '<li><a href="/about.html">About</a></li>' +
          '<li><a href="/manufacturing.html">Manufacturing</a></li>' +
          '<li><a href="/partners.html">Partners</a></li>' +
+         '<li><a href="/faq.html">FAQ</a></li>' +
          '<li><a href="/contact.html">Contact</a></li>' +
        '</ul></div>' +
        '<div><h4>Support</h4><ul>' +
