@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -20,6 +20,7 @@
       <div class="actions">
         <button class="btn btn-ghost" id="btn-seed" data-i18n="prod.seed">Seed from products.json</button>
         <button class="btn btn-primary" id="btn-new" data-i18n="prod.addProduct">Add product</button>
+        <button class="btn btn-ghost" id="btn-quick" data-i18n="prod.quickAdd">Quick add</button>
       </div>
     </div>
     <div class="filters">
@@ -168,7 +169,20 @@
             '<div class="field"><label data-i18n="edit.field.primaryImage">Primary image</label><input name="primary_image" value="' + a.esc(p.primary_image || '') + '" placeholder="assets/caps/dad/dad-cap-white.png"></div>' +
             '<div class="field"><label data-i18n="edit.field.images">Other images</label><input name="images" value="' + a.esc((p.images || []).join(', ')) + '"></div>' +
           '</div>' +
-          '<div class="field"><label data-i18n="edit.field.desc">Description</label><textarea name="desc" rows="4">' + a.esc(p.desc || '') + '</textarea></div>' +
+          '<div class="field">' +
+            '<label>Product images <span style="color:var(--muted);font-size:12px;font-weight:400"> - upload multiple, click star to set primary, X to remove. Stored as base64 in D1.</span></label>' +
+            '<div class="img-uploader">' +
+              '<input type="file" accept="image/*" multiple id="img-file-input" style="display:none">' +
+              '<div class="img-dropzone" id="img-dropzone">' +
+                '<button type="button" class="btn btn-sm btn-ghost" id="img-pick">+ Upload images</button>' +
+                '<span style="color:var(--muted);font-size:12px;margin-left:12px">or drag and drop image files here</span>' +
+              '</div>' +
+              '<div class="img-previews" id="img-previews"></div>' +
+              '<input type="hidden" name="primary_image" id="img-primary" value="' + a.esc(p.primary_image || '') + '">' +
+              '<input type="hidden" name="images_json" id="img-list" value="' + a.esc(JSON.stringify(p.images || [])) + '">' +
+            '</div>' +
+          '</div>' +
+          '<div class="field"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><label data-i18n="edit.field.desc" style="flex:1;margin:0">Description</label><button type="button" class="btn btn-sm btn-ghost" id="prod-ai-write">\u2728 AI write</button></div><textarea name="desc" id="prod-desc" rows="4">' + a.esc(p.desc || '') + '</textarea></div>' +
           '<div class="form-row three">' +
             '<div class="field"><label data-i18n="edit.field.availability">Availability</label><select name="availability"><option value="in_stock"' + (p.availability === 'in_stock' ? ' selected' : '') + '>In stock</option><option value="out_of_stock"' + (p.availability === 'out_of_stock' ? ' selected' : '') + '>Out of stock</option><option value="preorder"' + (p.availability === 'preorder' ? ' selected' : '') + '>Preorder</option></select></div>' +
             '<div class="field"><label data-i18n="edit.field.condition">Condition</label><select name="condition"><option value="new"' + (p.condition === 'new' ? ' selected' : '') + '>New</option><option value="used"' + (p.condition === 'used' ? ' selected' : '') + '>Used</option></select></div>' +
@@ -189,12 +203,101 @@
     function bindEditor(p, mode) {
       window.czI18n.applyAll(a.$('#prod-form'));
       const form = a.$('#prod-form');
+
+      // === Image uploader state and helpers ===
+      // imagesList holds dataURL strings; primaryIdx is the index in imagesList (or '' for existing path).
+      const state = { images: [], primaryIdx: -1, existingPrimary: (p.primary_image || '') };
+      try {
+        const pre = JSON.parse(form.querySelector('#img-list').value || '[]');
+        if (Array.isArray(pre)) state.images = pre.slice();
+        if (state.existingPrimary) {
+          state.primaryIdx = state.images.indexOf(state.existingPrimary);
+        }
+      } catch (e) {}
+
+      function renderPreviews() {
+        const host = form.querySelector('#img-previews');
+        if (!host) return;
+        host.innerHTML = state.images.map((src, i) => {
+          const isPrimary = i === state.primaryIdx;
+          return '<div class="img-preview' + (isPrimary ? ' is-primary' : '') + '" data-idx="' + i + '">' +
+            '<img src="' + a.esc(src).replace(/"/g, '&quot;') + '" alt="">' +
+            '<div class="img-actions">' +
+              '<button type="button" class="img-star" data-act="primary" title="Set as primary">' + (isPrimary ? '★' : '☆') + '</button>' +
+              '<button type="button" class="img-x" data-act="remove" title="Remove">×</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+        const primary = state.primaryIdx >= 0 ? state.images[state.primaryIdx] : '';
+        form.querySelector('#img-primary').value = primary;
+        form.querySelector('#img-list').value = JSON.stringify(state.images);
+      }
+      renderPreviews();
+
+      function readFiles(files) {
+        Array.from(files).forEach(file => {
+          if (!file.type || file.type.indexOf('image/') !== 0) return;
+          if (file.size > 600 * 1024) { a.toast('Image "' + file.name + '" too large (max 600 KB)', 'error'); return; }
+          const reader = new FileReader();
+          reader.onload = ev => {
+            state.images.push(String(ev.target.result || ''));
+            if (state.primaryIdx < 0 && !state.existingPrimary) state.primaryIdx = 0;
+            renderPreviews();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      const fileInput = form.querySelector('#img-file-input');
+      const dropzone = form.querySelector('#img-dropzone');
+      if (fileInput && dropzone) {
+        form.querySelector('#img-pick').addEventListener('click', e => { e.preventDefault(); fileInput.click(); });
+        fileInput.addEventListener('change', e => { readFiles(e.target.files); e.target.value = ''; });
+        ['dragenter', 'dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+        ['dragleave', 'drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+        dropzone.addEventListener('drop', e => { if (e.dataTransfer && e.dataTransfer.files) readFiles(e.dataTransfer.files); });
+      }
+      form.querySelector('#img-previews').addEventListener('click', e => {
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const card = btn.closest('.img-preview');
+        if (!card) return;
+        const idx = Number(card.getAttribute('data-idx'));
+        const act = btn.getAttribute('data-act');
+        if (act === 'primary') { state.primaryIdx = idx; }
+        else if (act === 'remove') { state.images.splice(idx, 1); if (state.primaryIdx === idx) state.primaryIdx = state.images.length ? 0 : -1; else if (state.primaryIdx > idx) state.primaryIdx--; }
+        renderPreviews();
+      });
+
+      a.$('#prod-save').addEventListener('click', async () => {
+      const aiBtn = form.querySelector('#prod-ai-write');
+      if (aiBtn) aiBtn.addEventListener('click', async () => {
+        const d = Object.fromEntries(new FormData(form).entries());
+        if (!d.name) { a.toast('Fill in the name first', 'error'); return; }
+        const orig = aiBtn.textContent;
+        aiBtn.disabled = true; aiBtn.textContent = '\u2728 Writing...';
+        try {
+          const r = await a.api('POST', '/ai-describe', {
+            name: d.name, cat: d.cat || 'cap', color: d.color || '',
+            material: d.material || '', origin: d.origin || '',
+            price: Number(d.price) || 0, badge: d.badge || ''
+          });
+          if (r && r.description) {
+            const ta = form.querySelector('#prod-desc');
+            if (ta) ta.value = r.description;
+            a.toast('Description generated', 'success');
+          } else { a.toast('AI returned no text', 'error'); }
+        } catch (e) { a.toast('AI write failed: ' + e.message, 'error'); }
+        finally { aiBtn.disabled = false; aiBtn.textContent = orig; }
+      });
+
       a.$('#prod-save').addEventListener('click', async () => {
         const data = Object.fromEntries(new FormData(form).entries());
         ['featured','new','active','identifier_exists'].forEach(k => { data[k] = form.querySelector('[name="' + k + '"]').checked; });
         data.sizes = data.sizes ? data.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
         data.colors = data.colors ? data.colors.split(',').map(s => s.trim()).filter(Boolean) : [];
-        data.images = data.images ? data.images.split(',').map(s => s.trim()).filter(Boolean) : [];
+        try { data.images = JSON.parse(data.images_json || '[]'); } catch (e) { data.images = []; }
+        delete data.images_json;
         ['price','compare_at','weight_lb'].forEach(k => { if (data[k] === '') data[k] = null; });
         try {
           if (mode === 'edit') await a.api('PUT', '/products/' + p.id, data);
@@ -221,6 +324,153 @@
     }
 
     a.$('#btn-new').addEventListener('click', () => openEditor(null));
+    a.$('#btn-quick').addEventListener('click', () => openQuickAdd());
+
+    function openQuickAdd() {
+      const html = '<div class="modal-head"><h2>' + I('prod.quickAddTitle') + '</h2><button class="close-x" onclick="czAdmin.closeModal()">&times;</button></div>' +
+        '<form id="quick-form" class="modal-body">' +
+          '<p style="color:var(--muted);font-size:13px;margin:0 0 12px">' + I('prod.quickAddDesc') + '</p>' +
+          '<div class="form-row">' +
+            '<div class="field"><label>Category</label><select name="cat" id="q-cat">' + ['dad','mom','wife','set','fedora','panama','beret','cap','sun','beanie'].map(c => '<option' + (c === 'cap' ? ' selected' : '') + '>' + c + '</option>').join('') + '</select></div>' +
+            '<div class="field"><label>SKU (auto) <span style="color:var(--muted);font-size:12px;font-weight:400">- editable</span></label><input name="id" id="q-id" pattern="[a-z0-9-]+" placeholder="auto-generated"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="field"><label>Product name <span style="color:#c44">*</span></label><input name="name" required placeholder="Brown Felt Fedora"></div>' +
+            '<div class="field"><label>Price (USD) <span style="color:#c44">*</span></label><input type="number" step="0.01" name="price" required value="34"></div>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Images <span style="color:var(--muted);font-size:12px;font-weight:400"> - upload one or more (max 600 KB each)</span></label>' +
+            '<div class="img-uploader">' +
+              '<input type="file" accept="image/*" multiple id="q-img-input" style="display:none">' +
+              '<div class="img-dropzone" id="q-img-drop">' +
+                '<button type="button" class="btn btn-sm btn-ghost" id="q-img-pick">+ Upload images</button>' +
+                '<span style="color:var(--muted);font-size:12px;margin-left:12px">or drag and drop here</span>' +
+              '</div>' +
+              '<div class="img-previews" id="q-img-previews"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="field">' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+              '<label style="flex:1;margin:0">Description <span style="color:var(--muted);font-size:12px;font-weight:400"> - auto-fill with AI</span></label>' +
+              '<button type="button" class="btn btn-sm btn-ghost" id="q-ai-write">\u2728 AI write</button>' +
+            '</div>' +
+            '<textarea name="desc" id="q-desc" rows="4" placeholder="Click AI write to auto-generate from name + category."></textarea>' +
+          '</div>' +
+        '</form>' +
+        '<div class="modal-foot">' +
+          '<button class="btn btn-ghost" onclick="czAdmin.closeModal()">Cancel</button>' +
+          '<button class="btn btn-primary" id="q-save">' + I('prod.quickAddSubmit') + '</button>' +
+        '</div>';
+      a.openModal(html, { large: true });
+      const state = { images: [], primaryIdx: -1 };
+      // Auto-generate SKU from name + category, like 'fedora-brown-felt-fedora-a1b'
+      function autoSku(name, cat) {
+        const slug = String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const short = Math.random().toString(36).slice(2, 5);
+        return (cat ? cat + '-' : '') + (slug || 'product') + '-' + short;
+      }
+      function refreshSkuPreview() {
+        const idEl = a.$('#q-id');
+        if (!idEl || idEl.value) return;
+        const name = a.$('#quick-form [name="name"]').value;
+        const cat = a.$('#q-cat').value;
+        idEl.placeholder = autoSku(name, cat);
+      }
+      a.$('#quick-form [name="name"]').addEventListener('input', refreshSkuPreview);
+      a.$('#q-cat').addEventListener('change', refreshSkuPreview);
+
+      function render() {
+        const host = a.$('#q-img-previews');
+        host.innerHTML = state.images.map((src, i) =>
+          '<div class="img-preview' + (i === state.primaryIdx ? ' is-primary' : '') + '" data-idx="' + i + '">' +
+            '<img src="' + a.esc(src).replace(/"/g, '&quot;') + '" alt="">' +
+            '<div class="img-actions">' +
+              '<button type="button" data-act="primary" title="Set as primary">' + (i === state.primaryIdx ? '\u2605' : '\u2606') + '</button>' +
+              '<button type="button" data-act="remove" title="Remove">\u00d7</button>' +
+            '</div>' +
+          '</div>'
+        ).join('');
+      }
+      function read(files) {
+        Array.from(files).forEach(f => {
+          if (!f.type || f.type.indexOf('image/') !== 0) return;
+          if (f.size > 600 * 1024) { a.toast('Image "' + f.name + '" too large (max 600 KB)', 'error'); return; }
+          const r = new FileReader();
+          r.onload = ev => { state.images.push(String(ev.target.result || '')); if (state.primaryIdx < 0) state.primaryIdx = 0; render(); };
+          r.readAsDataURL(f);
+        });
+      }
+      a.$('#q-img-pick').addEventListener('click', e => { e.preventDefault(); a.$('#q-img-input').click(); });
+      a.$('#q-img-input').addEventListener('change', e => { read(e.target.files); e.target.value = ''; });
+      const drop = a.$('#q-img-drop');
+      ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+      ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+      drop.addEventListener('drop', e => { if (e.dataTransfer && e.dataTransfer.files) read(e.dataTransfer.files); });
+      a.$('#q-img-previews').addEventListener('click', e => {
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const card = btn.closest('.img-preview');
+        if (!card) return;
+        const idx = Number(card.getAttribute('data-idx'));
+        if (btn.getAttribute('data-act') === 'primary') state.primaryIdx = idx;
+        else { state.images.splice(idx, 1); if (state.primaryIdx === idx) state.primaryIdx = state.images.length ? 0 : -1; else if (state.primaryIdx > idx) state.primaryIdx--; }
+        render();
+      });
+      a.$('#q-save').addEventListener('click', async () => {
+      a.$('#q-ai-write').addEventListener('click', async () => {
+        const form = a.$('#quick-form');
+        const data = Object.fromEntries(new FormData(form).entries());
+        if (!data.name) { a.toast('Fill in the name first', 'error'); return; }
+        const btn = a.$('#q-ai-write');
+        const orig = btn.textContent;
+        btn.disabled = true; btn.textContent = '\u2728 Writing...';
+        try {
+          const r = await a.api('POST', '/ai-describe', {
+            name: data.name, cat: data.cat || 'cap',
+            color: data.color || '', material: data.material || '100% cotton',
+            origin: data.origin || 'Imported', price: Number(data.price) || 0,
+            badge: data.badge || ''
+          });
+          if (r && r.description) {
+            a.$('#q-desc').value = r.description;
+            a.toast('Description generated', 'success');
+          } else {
+            a.toast('AI returned no text', 'error');
+          }
+        } catch (e) {
+          a.toast('AI write failed: ' + e.message, 'error');
+        } finally {
+          btn.disabled = false; btn.textContent = orig;
+        }
+      });
+
+      a.$('#q-save').addEventListener('click', async () => {
+        const form = a.$('#quick-form');
+        const data = Object.fromEntries(new FormData(form).entries());
+        if (!data.name || !data.price) { a.toast('Name and price are required', 'error'); return; }
+        const id = data.id && data.id.trim() ? data.id.trim() : autoSku(data.name, data.cat);
+        const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const body = {
+          id: id, slug: 'czevip-' + slug, name: data.name, cat: data.cat,
+          price: Number(data.price), compare_at: null,
+          material: '100% cotton', origin: 'Imported', weight_lb: 0.3,
+          badge: '', featured: false, new: true,
+          sizes: ['One size'], colors: [],
+          condition: 'new', availability: 'in_stock',
+          primary_image: state.primaryIdx >= 0 ? state.images[state.primaryIdx] : '',
+          images: state.images.slice(),
+          description: data.desc || (data.name + ' from CZEVIP. Edit full description in the product editor.'),
+          active: true
+        };
+        try {
+          const r = await a.api('POST', '/products', body);
+          a.toast(I('prod.created') + ': ' + r.id, 'success');
+          a.closeModal();
+          load();
+        } catch (e) { a.toast(I('prod.saveFailed') + ': ' + e.message, 'error'); }
+      });
+    }
+
     a.$('#btn-seed').addEventListener('click', async () => {
       if (!confirm(I('dash.seed') + '?')) return;
       try {

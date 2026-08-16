@@ -1,5 +1,6 @@
-/zh /zh/ 301
+﻿/zh /zh/ 301
 /zh/* /zh/:splat 301
 /api/old-checkout /api/checkout 301
 /admin /admin/index.html 301
 /admin/ /admin/index.html 301
+

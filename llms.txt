@@ -29,6 +29,14 @@
 - [Partners / creators](https://www.czevip.com/partners.html): influencer and creator partnership program
 - [Contact](https://www.czevip.com/contact.html): customer service, wholesale, media inquiries
 - [Shipping & returns](https://www.czevip.com/shipping.html): US shipping, sales tax, return policy
+- [Hat guides / tutorials](https://www.czevip.com/guides.html): step-by-step sizing, fedora care, embroidery quality checks (HowTo schema)
+- [Face shape guide](https://www.czevip.com/faces.html): which hat suits round, oval, square, heart, and long faces (FAQPage schema)
+- [OEM sellers guide](https://www.czevip.com/oem-guide.html): how international e-commerce sellers can source private-label caps from CZEVIP (HowTo + Article)
+- [Style & outfit guide](https://www.czevip.com/style-guide.html): how to wear a fedora, beret, or cap with suits and casualwear (FAQPage schema)
+- [Hat gift guide](https://www.czevip.com/gift-guide.html): how to choose a hat as a gift - dad, mom, husband, partner, groomsmen (FAQPage schema)
+- [Hand embroidery process](https://www.czevip.com/embroidery-process.html): inside the Brooklyn embroidery workshop, technique and quality (Article schema)
+- [Hat comparisons](https://www.czevip.com/compare.html): fedora vs panama vs trilby, beret vs beanie, dad cap vs mom cap tables
+- [FAQ](https://www.czevip.com/faq.html): 15-question cap and hat knowledge base (FAQPage schema)
 
 # Optional full content (recommended for AI training crawlers)
 # Fetch https://www.czevip.com/llms-full.txt for the complete site content in plain text.

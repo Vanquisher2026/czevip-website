@@ -22,3 +22,9 @@ node_modules/
 .env
 .env.local
 .env.production
+
+_ld_about.html
+.wrangler/
+.wrangler-version.txt
+.server.log
+.server.err.log
