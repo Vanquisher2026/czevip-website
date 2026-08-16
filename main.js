@@ -15,36 +15,35 @@
      hours: 'Mo-Fr 09:00-17:00 EST'
    };
    const ADDRESS_INLINE = BIZ.street + ', ' + BIZ.city + ', ' + BIZ.region + ' ' + BIZ.postal + ', ' + BIZ.country;
-   // === Header (rendered once into [data-header]) ===
-   function headerHTML() {
-     return '<header class="site-header"><div class="bar">' +
-       '<a class="logo" href="/">CZEVIP</a>' +
-      '<nav>' +
-        '<a href="/products.html">Shop</a>' +
-        '<a href="/manufacturing.html">Manufacturing</a>' +
-        '<a href="/partners.html">Partners</a>' +
-        '<a href="/about.html">About</a>' +
-        '<div class="nav-dd">' +
-          '<a href="/guides.html" class="nav-dd-trigger">Guides</a>' +
-          '<div class="nav-dd-menu">' +
-            '<a href="/guides.html">All guides</a>' +
-            '<a href="/faces.html">Face shape guide</a>' +
-            '<a href="/oem-guide.html">OEM sellers guide</a>' +
-            '<a href="/style-guide.html">Style &amp; outfit guide</a>' +
-            '<a href="/compare.html">Hat comparisons</a>' +
-            '<a href="/faq.html">FAQ</a>' +
-          '</div>' +
-        '</div>' +
-        '<a href="/contact.html">Contact</a>' +
-      '</nav>' +
-       '<div class="bar-actions">' +
-         '<a class="lang-toggle" href="/zh/" aria-label="Switch language">EN / ZH</a>' +
-         '<a class="cart-link" href="/cart.html" aria-label="Cart">' +
-           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 4h2l2.4 12.5a2 2 0 002 1.5h8.2a2 2 0 002-1.5L21 8H6"/></svg>' +
-           '<span class="cart-count" data-cart-count>0</span>' +
-         '</a>' +
-       '</div></div></header>';
-   }
+  // === Header (rendered once into [data-header]) ===
+  function headerHTML() {
+    return '<header class="site-header"><div class="bar">' +
+      '<a class="logo" href="/">CZEVIP</a>' +
+     '<nav>' +
+       '<a href="/products.html">Shop</a>' +
+       '<a href="/manufacturing.html">Manufacturing</a>' +
+       '<a href="/partners.html">Partners</a>' +
+       '<a href="/about.html">About</a>' +
+       '<div class="nav-dd">' +
+         '<a href="/guides.html" class="nav-dd-trigger">Guides</a>' +
+         '<div class="nav-dd-menu">' +
+           '<a href="/guides.html">All guides</a>' +
+           '<a href="/faces.html">Face shape guide</a>' +
+           '<a href="/oem-guide.html">OEM sellers guide</a>' +
+           '<a href="/style-guide.html">Style &amp; outfit guide</a>' +
+           '<a href="/compare.html">Hat comparisons</a>' +
+           '<a href="/faq.html">FAQ</a>' +
+         '</div>' +
+       '</div>' +
+       '<a href="/contact.html">Contact</a>' +
+     '</nav>' +
+      '<div class="bar-actions">' +
+        '<a class="cart-link" href="/cart.html" aria-label="Cart">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 4h2l2.4 12.5a2 2 0 002 1.5h8.2a2 2 0 002-1.5L21 8H6"/></svg>' +
+          '<span class="cart-count" data-cart-count>0</span>' +
+        '</a>' +
+      '</div></div></header>';
+  }
    // === Footer (single source for US business info + GMC + bank compliance links) ===
    function footerHTML() {
      return '<footer class="site-footer"><div class="footer-grid">' +
@@ -60,25 +59,31 @@
          '<li><a href="/products.html?cat=set">Mom &amp; Dad Set</a></li>' +
          '<li><a href="/products.html">All</a></li>' +
        '</ul></div>' +
-      '<div><h4>Company</h4><ul>' +
-        '<li><a href="/about.html">About</a></li>' +
-        '<li><a href="/manufacturing.html">Manufacturing</a></li>' +
-        '<li><a href="/partners.html">Partners</a></li>' +
-        '<li><a href="/faq.html">FAQ</a></li>' +
-        '<li><a href="/guides.html">Guides</a></li>' +
-        '<li><a href="/faces.html">Face shape guide</a></li>' +
-        '<li><a href="/oem-guide.html">OEM sellers guide</a></li>' +
-        '<li><a href="/style-guide.html">Style guide</a></li>' +
-        '<li><a href="/compare.html">Compare</a></li>' +
-        '<li><a href="/contact.html">Contact</a></li>' +
+     '<div><h4>Company</h4><ul>' +
+       '<li><a href="/about.html">About</a></li>' +
+       '<li><a href="/manufacturing.html">Manufacturing</a></li>' +
+       '<li><a href="/partners.html">Partners</a></li>' +
+       '<li><a href="/faq.html">FAQ</a></li>' +
+       '<li><a href="/guides.html">Guides</a></li>' +
+       '<li><a href="/faces.html">Face shape guide</a></li>' +
+       '<li><a href="/oem-guide.html">OEM sellers guide</a></li>' +
+       '<li><a href="/style-guide.html">Style guide</a></li>' +
+       '<li><a href="/compare.html">Compare</a></li>' +
+       '<li><a href="/contact.html">Contact</a></li>' +
+     '</ul></div>' +
+      '<div><h4>Support</h4><ul>' +
+        '<li><a href="/shipping.html">Shipping &amp; returns</a></li>' +
+        '<li><a href="/privacy.html">Privacy</a></li>' +
+        '<li><a href="/terms.html">Terms</a></li>' +
+        '<li><a href="/google-merchant.xml">Product feed</a></li>' +
       '</ul></div>' +
-       '<div><h4>Support</h4><ul>' +
-         '<li><a href="/shipping.html">Shipping &amp; returns</a></li>' +
-         '<li><a href="/privacy.html">Privacy</a></li>' +
-         '<li><a href="/terms.html">Terms</a></li>' +
-         '<li><a href="/google-merchant.xml">Product feed</a></li>' +
-       '</ul></div>' +
-     '</div>' +
+      '<div><h4>Reviews &amp; Authority</h4><ul>' +
+        '<li><a href="https://www.trustpilot.com/review/czevip.com" target="_blank" rel="noopener nofollow">Trustpilot profile</a></li>' +
+        '<li><a href="https://www.reddit.com/user/CZEVIP_Workshop/" target="_blank" rel="noopener nofollow">Reddit updates</a></li>' +
+        '<li><a href="/llms.txt">llms.txt (AI bots)</a></li>' +
+        '<li><a href="https://search.google.com/search-console?resource_id=https://czevip.com/" target="_blank" rel="noopener nofollow">Google indexed pages</a></li>' +
+      '</ul></div>' +
+    '</div>' +
      '<div class="footer-meta">' +
        '<span>(c) 2026 ' + BIZ.legalName + '. All rights reserved.</span>' +
        '<span>' + BIZ.email + '</span>' +

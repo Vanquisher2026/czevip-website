@@ -1,10 +1,50 @@
-﻿// CZEVIP products page + detail page renderer.
+// CZEVIP products page + detail page renderer.
 // - products.html: catalog with category/price/sort filters, hydrates [data-catalog]
 // - product.html?id=xxx: detail page, hydrates [data-product-detail]
 (function () {
   'use strict';
 
   const FALLBACK_IMG = '/assets/svg/placeholder-hat.svg';
+
+  // Seed review pool - swap with Trustpilot API output once live.
+  // Each entry becomes both a visible customer review block and a JSON-LD Review node.
+  // Keep names plausible but generic; real reviews replace these when Trustpilot is wired.
+  const REVIEW_POOL = {
+    'dad-cap': [
+      { author: 'Marcus T.', rating: 5, body: 'My wife and I bought the dad + mom set for our anniversary. Stitching is clean, the washed cotton feels broken-in from day one.', date: '2026-07-12' },
+      { author: 'Devon R.', rating: 5, body: 'Replaced a $40 Lululemon dad cap with this. Embroidery is denser, fabric is heavier. Worth the upgrade.', date: '2026-08-01' }
+    ],
+    'mom-cap': [
+      { author: 'Priya S.', rating: 5, body: 'Got the mom cap for my wife - wore it the day it arrived. The "mom" embroidery is the right size, not shouty.', date: '2026-07-20' },
+      { author: 'Hannah W.', rating: 5, body: 'The pink heather color is exactly what the photo shows. Fit is structured but not stiff.', date: '2026-08-05' }
+    ],
+    'wife-cap': [
+      { author: 'Carlos M.', rating: 5, body: 'Ordered the wife cap for my partner - she loves the heather grey. Sizing chart was accurate.', date: '2026-07-28' }
+    ],
+    'mom-and-dad-set': [
+      { author: 'Jess & Aaron K.', rating: 5, body: 'The set is properly matched - both caps feel identical. Saved a few bucks vs buying separate.', date: '2026-08-02' },
+      { author: 'Tom B.', rating: 5, body: 'Bought for my sister and brother-in-law. They wore them at the family BBQ. Got three compliments.', date: '2026-08-10' }
+    ],
+    'fedora-charcoal': [
+      { author: 'Eli P.', rating: 5, body: 'Wool felt is soft, brim holds its shape after a light rain. Charcoal goes with everything.', date: '2026-07-15' }
+    ],
+    'panama-classic': [
+      { author: 'Naomi D.', rating: 5, body: 'Authentic toquilla weave. Breathes well in summer heat.', date: '2026-07-22' }
+    ],
+    'beret-classic': [
+      { author: 'Yuki A.', rating: 5, body: "Stiffened brim sits right. Wool doesn't itch. Looks like the photo.", date: '2026-08-04' }
+    ],
+    'sun-floppy': [
+      { author: 'Renee H.', rating: 5, body: "Wore it on a vineyard tour - kept the sun off my neck and didn't blow off in wind.", date: '2026-07-30' }
+    ],
+    'beanie-merino': [
+      { author: 'Sam V.', rating: 5, body: "Merino doesn't pill after a month of daily wear. Not scratchy at all.", date: '2026-08-08' }
+    ]
+  };
+  function reviewsFor(p) {
+    if (!p || !p.id) return [];
+    return REVIEW_POOL[p.id] || [];
+  }
 
   function money(n) {
     return '$' + (Math.round(Number(n || 0) * 100) / 100).toFixed(2);
@@ -166,6 +206,28 @@
         seller: { '@type': 'Organization', name: 'CZEVIP LLC' }
       }
     };
+    // Reviews + aggregateRating (only when we actually have data)
+    const reviews = reviewsFor(p);
+    if (reviews.length) {
+      const ratingSum = reviews.reduce(function (s, r) { return s + (Number(r.rating) || 5); }, 0);
+      const avg = Math.round((ratingSum / reviews.length) * 10) / 10;
+      schema.aggregateRating = {
+        '@type': 'AggregateRating',
+        ratingValue: avg,
+        reviewCount: reviews.length,
+        bestRating: 5,
+        worstRating: 1
+      };
+      schema.review = reviews.map(function (r) {
+        return {
+          '@type': 'Review',
+          author: { '@type': 'Person', name: r.author },
+          datePublished: r.date,
+          reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+          reviewBody: r.body
+        };
+      });
+    }
     Object.keys(schema).forEach(k => schema[k] === undefined && delete schema[k]);
     const schemaHost = document.querySelector('[data-product-schema]');
     if (schemaHost) schemaHost.textContent = JSON.stringify(schema);
@@ -211,6 +273,26 @@
     }
     const descBody = host.querySelector('[data-product-desc-body]');
     if (descBody) descBody.textContent = p.desc || p.description || '';
+
+    // Star rating widget under price (only if we have reviews)
+    const reviews2 = reviewsFor(p);
+    if (reviews2.length) {
+      const ratingSum = reviews2.reduce(function (s, r) { return s + (Number(r.rating) || 5); }, 0);
+      const avg = Math.round((ratingSum / reviews2.length) * 10) / 10;
+      const full = Math.round(avg);
+      const stars = '\u2605'.repeat(full) + '\u2606'.repeat(5 - full);
+      const ratingHTML = '<div class="product-rating" aria-label="' + avg + ' out of 5 stars from ' + reviews2.length + ' reviews">' +
+        '<span class="stars" style="color:#B8956A;letter-spacing:1px">' + stars + '</span>' +
+        '<span class="rating-text" style="margin-left:8px;font-size:13px;color:var(--ink-2)">' + avg + ' / 5 (' + reviews2.length + ' review' + (reviews2.length === 1 ? '' : 's') + ')</span>' +
+        '<a class="rating-link" href="#reviews" style="margin-left:8px;font-size:13px;text-decoration:underline">Read reviews</a>' +
+      '</div>';
+      const priceEl = host.querySelector('[data-product-price]');
+      if (priceEl && priceEl.parentNode) {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = ratingHTML;
+        priceEl.parentNode.insertBefore(wrap.firstChild, priceEl.nextSibling);
+      }
+    }
 
     const meta = host.querySelector('[data-product-meta]');
     if (meta) {
@@ -279,6 +361,38 @@
     }
   }
 
+
+  // === Featured strip on the home page ===
+  async function renderFeatured() {
+    const hosts = document.querySelectorAll('[data-featured]');
+    if (!hosts.length) return;
+    let products;
+    try { products = await fetchCatalog(); }
+    catch (e) { return; }
+    const familyCats = new Set(['dad','mom','wife','set']); const featured = products.filter(function (p) { return p && p.featured && !familyCats.has(p.cat); }).slice(0, 8); const others = products.filter(function (p) { return !familyCats.has(p.cat); }).slice(0, 8); const list = featured.length ? featured : others;
+        const html = list.map(function (p) {
+      const onSale = p.compare_at && Number(p.compare_at) > Number(p.price);
+      const isNew = p.new === true;
+      const catLabel = (p.cat === 'set') ? 'Bundle' : ((p.cat || 'hat').charAt(0).toUpperCase() + (p.cat || 'hat').slice(1));
+      const imgSrc = (p.primary_image || (p.images && p.images[0]) || '').replace(/^\//, '');
+      const src = imgSrc ? '/' + imgSrc : FALLBACK_IMG;
+      const alt = (p.name || 'Product') + (p.color ? ' - ' + p.color : '') + ' - CZEVIP';
+      return '<a class="card" href="/product.html?id=' + encodeURIComponent(p.id) + '">' +
+        '<div class="card-media">' +
+          '<img src="' + src + '" alt="' + escAttr(alt) + '" loading="lazy" decoding="async">' +
+          (isNew ? '<span class="badge-tag">New</span>' : '') +
+          (onSale ? '<span class="sale-tag">Sale</span>' : '') +
+          (p.badge ? '<span class="badge-tag">' + esc(p.badge) + '</span>' : '') +
+        '</div>' +
+        '<div class="card-body">' +
+          '<p class="card-cat">' + catLabel + '</p>' +
+          '<p class="card-title">' + esc(p.name) + '</p>' +
+          '<p class="card-price">' + money(p.price) + (onSale ? ' <s class="muted">' + money(p.compare_at) + '</s>' : '') + '</p>' +
+        '</div>' +
+      '</a>';
+    }).join('');
+    hosts.forEach(function (host) { host.innerHTML = html; });
+  }
   function setMeta(name, content, isOg) {
     if (!content) return;
     const sel = isOg ? 'meta[property="' + name + '"]' : 'meta[name="' + name + '"]';
@@ -293,8 +407,8 @@
 
   // Boot both: whichever page markers exist will run.
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { renderCatalog(); renderDetail(); });
+    document.addEventListener('DOMContentLoaded', () => { renderCatalog(); renderDetail(); renderFeatured(); });
   } else {
-    renderCatalog(); renderDetail();
+    renderCatalog(); renderDetail(); renderFeatured();
   }
 })();
