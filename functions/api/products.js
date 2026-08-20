@@ -10,7 +10,7 @@ export async function onRequest({ env }) {
   if (env.DB) {
     try {
       const { results } = await env.DB.prepare(
-        'SELECT id, slug, name, color, cat, price, compare_at, material, origin, weight_lb, badge, featured, is_new AS "new", sizes, colors, gtin, mpn, identifier_exists, condition, availability, primary_image, images, description AS desc FROM products WHERE active = 1 ORDER BY featured DESC, id'
+        'SELECT id, slug, name, color, cat, price, compare_at, material, origin, weight_lb, badge, featured, is_new AS "new", sizes, colors, gtin, mpn, identifier_exists, condition, availability, primary_image, images, description AS desc, updated_at FROM products WHERE active = 1 ORDER BY featured DESC, id'
       ).all();
       if (results && results.length) {
         const products = results.map(r => ({
@@ -23,6 +23,8 @@ export async function onRequest({ env }) {
           price: Number(r.price),
           compare_at: r.compare_at == null ? null : Number(r.compare_at),
           weight_lb: Number(r.weight_lb)
+          ,
+          updated_at: r.updated_at == null ? null : Number(r.updated_at)
         }));
         return new Response(JSON.stringify({ currency: 'USD', products }), { headers: { ...cors, 'Content-Type': 'application/json' } });
       }

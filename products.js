@@ -96,6 +96,8 @@
        '<div class="card-media">' + img(p) + (isNew ? '<span class="badge-tag">New</span>' : '') + (onSale ? '<span class="sale-tag">Sale</span>' : '') + (p.badge ? '<span class="badge-tag">' + esc(p.badge) + '</span>' : '') + '</div>' +
        '<div class="card-body">' +
          '<p class="card-cat">' + catLabel + '</p>' +
+         (p.updated_at && (Date.now() / 1000 - Number(p.updated_at)) < 7 * 24 * 3600 ? '<p class="ai-badge">AI-enhanced</p>' : '') +
+         (p.updated_at && (Date.now() / 1000 - Number(p.updated_at)) < 7 * 24 * 3600 ? '<p class="ai-badge">AI-enhanced</p>' : '') +
 
           '<p class="card-title">' + esc(p.name) + '</p>' +
           '<p class="card-price">' + money(p.price) + (onSale ? ' <s class="muted">' + money(p.compare_at) + '</s>' : '') + '</p>' +

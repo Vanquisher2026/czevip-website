@@ -20,6 +20,7 @@
       <div class="actions">
         <button class="btn btn-ghost" id="btn-seed" data-i18n="prod.seed">Seed from products.json</button>
         <button class="btn btn-primary" id="btn-new" data-i18n="prod.addProduct">Add product</button>
+        <button class="btn btn-ghost" id="btn-ai-all" title="Regenerate every product description with AI" data-i18n="prod.aiRefreshAll">AI refresh all</button>
         <button class="btn btn-ghost" id="btn-quick" data-i18n="prod.quickAdd">Quick add</button>
       </div>
     </div>
@@ -103,12 +104,14 @@
             '<td>' + (p.featured ? '<span class="badge badge-active">' + I('prod.featured') + '</span> ' : '') + (p.new ? '<span class="badge badge-new">' + I('prod.new') + '</span>' : '') + '</td>' +
             '<td>' + (p.active !== false ? '<span class="badge badge-active">' + I('prod.active') + '</span>' : '<span class="badge badge-inactive">' + I('prod.inactive') + '</span>') + '</td>' +
             '<td class="flex gap-8"><button class="btn btn-sm btn-ghost" data-edit="' + a.esc(p.id) + '">' + I('prod.edit') + '</button> ' +
+              '<button class="btn btn-sm btn-ghost" data-ai="' + a.esc(p.id) + '" title="Regenerate description with AI">' + I('prod.aiOne') + '</button> ' +
               '<button class="btn btn-sm btn-ghost" data-duplicate="' + a.esc(p.id) + '" title="Duplicate">' + I('prod.duplicate') + '</button> ' +
               (p.active !== false ? '<button class="btn btn-sm btn-danger" data-del="' + a.esc(p.id) + '">' + I('prod.archive') + '</button>' : '') + '</td>' +
           '</tr>'
         ).join('');
         a.$$('button[data-edit]').forEach(b => b.addEventListener('click', () => openEditor(b.getAttribute('data-edit'))));
         a.$$('button[data-duplicate]').forEach(b => b.addEventListener('click', () => duplicateProduct(b.getAttribute('data-duplicate'))));
+        a.$$('button[data-ai]').forEach(b => b.addEventListener('click', () => aiRegenerateOne(b.getAttribute('data-ai'), b)));
         a.$$('button[data-del]').forEach(b => b.addEventListener('click', () => archiveProduct(b.getAttribute('data-del'))));
         a.$$('.row-check').forEach(cb => {
           cb.addEventListener('change', () => {
@@ -323,8 +326,39 @@
       } catch (e) { a.toast('Duplicate failed: ' + e.message, 'error'); }
     }
 
+    async function aiRegenerateOne(id, btn) {
+      const orig = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = '...'; }
+      try {
+        const r = await a.api('POST', '/ai-regenerate', { id: id });
+        if (r && r.ok) {
+          a.toast(I('prod.aiRefreshed', { name: id }), 'success');
+          load();
+        } else {
+          a.toast((r && r.error) || 'AI failed', 'error');
+        }
+      } catch (e) { a.toast('AI failed: ' + e.message, 'error'); }
+      finally { if (btn) { btn.disabled = false; btn.textContent = orig; } }
+    }
+
+    async function aiRegenerateAll() {
+      const items = (items || []).filter(p => p.active !== false);
+      if (!items.length) { a.toast('No active products to refresh', 'error'); return; }
+      if (!confirm(I('prod.aiRefreshAllConfirm', { n: items.length }))) return;
+      const btn = a.$('#btn-ai-all');
+      const orig = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = 'AI 0/' + items.length; }
+      try {
+        const r = await a.api('POST', '/ai-regenerate', { all: true, scope: 'active' });
+        a.toast(I('prod.aiBatchDone', { ok: r.regenerated, failed: r.failed, total: r.total }), r.failed ? 'error' : 'success');
+        load();
+      } catch (e) { a.toast('AI batch failed: ' + e.message, 'error'); }
+      finally { if (btn) { btn.disabled = false; btn.textContent = orig; } }
+    }
+
     a.$('#btn-new').addEventListener('click', () => openEditor(null));
     a.$('#btn-quick').addEventListener('click', () => openQuickAdd());
+    a.$('#btn-ai-all').addEventListener('click', () => aiRegenerateAll());
 
     function openQuickAdd() {
       const html = '<div class="modal-head"><h2>' + I('prod.quickAddTitle') + '</h2><button class="close-x" onclick="czAdmin.closeModal()">&times;</button></div>' +
