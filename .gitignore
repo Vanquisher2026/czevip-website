@@ -2,6 +2,12 @@
 .server.log
 .server.err.log
 .cleanup.ps1
+# Ad-hoc debug scripts and logs (kept locally, not shipped)
+_verify.txt
+scripts/_*.ps1
+scripts/_*.log
+scripts/fix_*.py
+scripts/insert_*.ps1
 
 # OS junk
 Thumbs.db
